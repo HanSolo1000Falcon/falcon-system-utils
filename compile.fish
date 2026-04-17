@@ -5,4 +5,4 @@ rm -rf build
 cmake -B build
 cmake --build build
 mkdir -p ~/.fsysutils/
-cp -r build/fsysutils ~/.fsysutils/
+mv build/fsysutils ~/.fsysutils/
