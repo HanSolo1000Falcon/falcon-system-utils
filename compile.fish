@@ -1,4 +1,4 @@
-#!/bin/fish
+#!/usr/bin/env fish
 
 fish_add_path ~/.fsysutils
 cd ~/falcon-system-utils/
