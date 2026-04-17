@@ -1,8 +1,9 @@
 #!/bin/fish
 
 fish_add_path ~/.fsysutils
-rm -rf ~/falcon-system-utils/build
-cmake -B ~/falcon-system-utils/build
-cmake --build ~/falcon-system-utils/build
+cd ~/falcon-system-utils/
+rm -rf build
+cmake -B build
+cmake --build build
 mkdir -p ~/.fsysutils/
-mv ~/falcon-system-utils/build/fsysutils ~/.fsysutils/
+mv build/fsysutils ~/.fsysutils/
