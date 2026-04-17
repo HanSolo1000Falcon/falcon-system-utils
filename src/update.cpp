@@ -1,19 +1,30 @@
 #include "update.hpp"
 #include <cstdlib>
 #include <filesystem>
+#include <string>
 #include <system_error>
 
 void UpdateProgram() {
-  if (std::filesystem::exists("~/falcon-system-utils")) {
+  std::string home = getenv("HOME");
+  std::filesystem::path repoPath = home + "/falcon-system-utils";
+
+  if (std::filesystem::exists(repoPath)) {
     std::error_code error;
-    std::filesystem::remove_all("~/falcon-system-utils", error);
+    std::filesystem::remove_all(repoPath, error);
   }
 
-  system("git clone "
-         "\"https://github.com/HanSolo1000Falcon/falcon-system-utils.git\" "
-         "~/falcon-system-utils");
-  system("chmod +x ~/falcon-system-utils/compile.fish");
-  system("~/falcon-system-utils/compile.fish");
+  std::string cloneCmd =
+      "git clone "
+      "\"https://github.com/HanSolo1000Falcon/falcon-system-utils.git\" " +
+      repoPath.string();
+  system(cloneCmd.c_str());
+
+  std::string chmodCmd = "chmod +x " + repoPath.string() + "/compile.fish";
+  system(chmodCmd.c_str());
+
+  std::string runCmd = repoPath.string() + "/compile.fish";
+  system(runCmd.c_str());
+
   std::error_code error;
-  std::filesystem::remove_all("~/falcon-system-utils", error);
+  std::filesystem::remove_all(repoPath, error);
 }
