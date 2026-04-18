@@ -26,7 +26,7 @@ int main(int argc, char **argv) {
     return CreateProject(std::string(argv[3]), std::string(argv[4]));
   }
 
-  if (argc == 2 && strcmp(argv[1], "dotfiles")) {
+  if (argc == 2 && strcmp(argv[1], "dotfiles") == 0) {
     std::cout << "updating dotfiles\n\n";
     return Dotfiles();
   }
