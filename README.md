@@ -65,4 +65,4 @@ fsysutils update
 
 ## license
 
-mit so d whatever you want with it
+mit so do whatever you want with it
