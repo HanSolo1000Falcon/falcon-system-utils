@@ -26,7 +26,7 @@ int main(int argc, char **argv) {
   }
 
   std::cout
-      << "fsysutils help wizard!\n"
+      << "fsysutils help wizard!\n\n"
       << " usage: fsysutils <command> <subcommand (possibly exists, "
          "check command usage)> <args>\n\n"
       << " availabe commands:\n"
