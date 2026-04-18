@@ -1,5 +1,6 @@
 #include "create-header.hpp"
 #include "create-project.hpp"
+#include "dotfiles.hpp"
 #include "update.hpp"
 #include <cstring>
 #include <iostream>
@@ -25,6 +26,11 @@ int main(int argc, char **argv) {
     return CreateProject(std::string(argv[3]), std::string(argv[4]));
   }
 
+  if (argc == 2 && strcmp(argv[1], "dotfiles")) {
+    std::cout << "updating dotfiles\n\n";
+    return Dotfiles();
+  }
+
   std::cout
       << "fsysutils help wizard!\n\n"
       << " usage: fsysutils <command> <subcommand (possibly exists, "
@@ -42,7 +48,9 @@ int main(int argc, char **argv) {
          "written to it\n\n"
       << "     project\n"
       << "      args: name (name of the project), type (c|cpp)\n"
-      << "      creates a preconfigured project of the specified type\n";
+      << "      creates a preconfigured project of the specified type\n\n"
+      << "   dotfiles\n"
+      << "    fetches the newest revision of my dotfiles!\n";
 
   return 0;
 }

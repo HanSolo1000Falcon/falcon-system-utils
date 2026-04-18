@@ -11,6 +11,7 @@ add_executable(fsysutils src/main.cpp
             src/update.cpp
             src/create-header.cpp
             src/create-project.cpp
+            src/dotfiles.cpp
           )
 target_include_directories(fsysutils PRIVATE include)
 
