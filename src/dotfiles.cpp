@@ -20,6 +20,7 @@ int Dotfiles() {
             .c_str());
   }
 
-  std::system(("git -C " + configDir + " pull origin main").c_str());
+  std::system(("git -C " + configDir + " fetch origin").c_str());
+  std::system(("git -C " + configDir + " reset --hard origin/main").c_str());
   return 0;
 }
