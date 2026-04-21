@@ -2,6 +2,8 @@
 #include <cstdlib>
 #include <cstring>
 #include <filesystem>
+#include <fstream>
+#include <ios>
 #include <iostream>
 #include <string_view>
 constexpr std::string_view INVALID_USAGE =
@@ -48,6 +50,37 @@ int DotfilesCommands::FetchDotfiles(int argc, char **argv) {
   return 0;
 }
 
-int DotfilesCommands::AddDotfiles(int argc, char **argv) { return 0; }
+int DotfilesCommands::AddDotfiles(int argc, char **argv) {
+  if (argc < 4) {
+    std::cout << "Invalid usage.\n";
+    return 1;
+  }
 
-int DotfilesCommands::PushDotfiles(int argc, char **argv) { return 0; }
+  const auto configDirectory =
+      std::filesystem::path(getenv("HOME")) / ".config" / "fsysutils";
+
+  std::error_code caughtError;
+  if (!std::filesystem::exists(configDirectory, caughtError)) {
+    std::filesystem::create_directory(configDirectory);
+  }
+
+  std::ofstream gitAddFile(configDirectory / "git_add.fsysutil",
+                           std::ios_base::app | std::ios_base::out);
+  gitAddFile << " " << argv[3];
+  return 0;
+}
+
+int DotfilesCommands::PushDotfiles(int argc, char **argv) {
+  const auto configDirectory =
+      std::filesystem::path(getenv("HOME")) / ".config";
+  std::string gitAdds;
+  std::ifstream gitAddFile(configDirectory / "fsysutils" / "git_add.fsysutil");
+  std::getline(gitAddFile, gitAdds);
+
+  system(("git -C " + configDirectory.string() + " add " + gitAdds).c_str());
+  system(("git -C " + configDirectory.string() +
+          " commit -m \"Commited with fsysutils.\"")
+             .c_str());
+  system(("git -C " + configDirectory.string() + " push origin main").c_str());
+  return 0;
+}
