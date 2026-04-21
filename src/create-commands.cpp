@@ -5,17 +5,19 @@
 #include <iostream>
 #include <string>
 int CreateCommands::CallCreate(int argc, char **argv) {
-  if (strcmp(argv[2], "header") == 0) {
-    return CreateHeader(argc, argv);
-  } else if (strcmp(argv[2], "project") == 0) {
-    return CreateProject(argc, argv);
+  if (argc >= 3) {
+    if (strcmp(argv[2], "header") == 0) {
+      return CreateHeader(argc, argv);
+    } else if (strcmp(argv[2], "project") == 0) {
+      return CreateProject(argc, argv);
+    }
   }
 
   std::cout << "Invalid usage.\n"
             << "Usage: fsysutils create <subcommand>*\n\n"
             << "Subcommands:\n"
             << "  header <subdirectory> <name> <type(c|cpp)>\n"
-            << "  project <name> <type(c|cpp)>";
+            << "  project <name> <type(c|cpp)>\n";
   return 0;
 }
 
