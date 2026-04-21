@@ -1,4 +1,5 @@
 #include "create-commands.hpp"
+#include "dotfiles-commands.hpp"
 #include <cstring>
 #include <iostream>
 int main(int argc, char **argv) {
@@ -15,6 +16,7 @@ int main(int argc, char **argv) {
         << "Available commands:\n"
         << "  update\n"
         << "  create\n"
+        << "  dotfiles\n"
         << "\n"
         << "Run any of them to get their individual usage instructions.\n";
     return 0;
@@ -28,6 +30,10 @@ int main(int argc, char **argv) {
 
   if (strcmp(argv[1], "create") == 0) {
     return CreateCommands::CallCreate(argc, argv);
+  }
+
+  if (strcmp(argv[1], "dotfiles") == 0) {
+    return DotfilesCommands::CallDotfiles(argc, argv);
   }
 
   std::cout << "Invalid usage; try 'fsysutils help' for usage instructions.\n";

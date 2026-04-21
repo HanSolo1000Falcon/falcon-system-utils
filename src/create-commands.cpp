@@ -4,27 +4,27 @@
 #include <fstream>
 #include <iostream>
 #include <string>
-int CreateCommands::CallCreate(int argc, char **argv) {
-  if (argc >= 3) {
-    if (strcmp(argv[2], "header") == 0) {
-      return CreateHeader(argc, argv);
-    } else if (strcmp(argv[2], "project") == 0) {
-      return CreateProject(argc, argv);
-    }
+#include <string_view>
+constexpr std::string_view INVALID_USAGE =
+    "Invalid usage.\nUsage: fsysutils create <subcommand> *\n\nAvailable "
+    "subcommands:\n  "
+    "header <subdirectory> <name> <type(c|cpp)>\n  project <name> "
+    "<type(c|cpp)>\n";
 
-    std::cout << "Invalid usage.\n"
-              << "Usage: fsysutils create <subcommand>*\n\n"
-              << "Subcommands:\n"
-              << "  header <subdirectory> <name> <type(c|cpp)>\n"
-              << "  project <name> <type(c|cpp)>\n";
+int CreateCommands::CallCreate(int argc, char **argv) {
+  if (argc < 3) {
+    std::cout << INVALID_USAGE;
+    return 1;
   }
 
-  std::cout << "Invalid usage.\n"
-            << "Usage: fsysutils create <subcommand>*\n\n"
-            << "Subcommands:\n"
-            << "  header <subdirectory> <name> <type(c|cpp)>\n"
-            << "  project <name> <type(c|cpp)>\n";
-  return 0;
+  if (strcmp(argv[2], "header") == 0) {
+    return CreateHeader(argc, argv);
+  } else if (strcmp(argv[2], "project") == 0) {
+    return CreateProject(argc, argv);
+  }
+
+  std::cout << INVALID_USAGE;
+  return 1;
 }
 
 int CreateCommands::CreateHeader(int argc, char **argv) {

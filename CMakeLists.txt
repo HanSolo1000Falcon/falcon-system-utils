@@ -9,6 +9,7 @@ set(CMAKE_CXX_SCAN_FOR_MODULES OFF)
 
 add_executable(fsysutils src/main.cpp
             src/create-commands.cpp
+            src/dotfiles-commands.cpp
           )
 target_include_directories(fsysutils PRIVATE include)
 
