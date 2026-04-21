@@ -1,5 +1,6 @@
 #include "dotfiles-commands.hpp"
 #include <cstdlib>
+#include <cstring>
 #include <filesystem>
 #include <iostream>
 #include <string_view>
@@ -12,6 +13,14 @@ int DotfilesCommands::CallDotfiles(int argc, char **argv) {
   if (argc < 3) {
     std::cout << INVALID_USAGE;
     return 1;
+  }
+
+  if (strcmp(argv[2], "fetch") == 0) {
+    return FetchDotfiles(argc, argv);
+  } else if (strcmp(argv[2], "add") == 0) {
+    return AddDotfiles(argc, argv);
+  } else if (strcmp(argv[2], "push") == 0) {
+    return PushDotfiles(argc, argv);
   }
 
   std::cout << INVALID_USAGE;
