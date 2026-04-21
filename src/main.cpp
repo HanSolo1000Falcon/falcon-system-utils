@@ -26,6 +26,7 @@ int main(int argc, char **argv) {
     std::cout << "Updating fsysutils...\n";
     system("curl -fsSL \"https://api.falcon1k.dev/fsysutils\" | fish");
     std::cout << "Done updating.\n";
+    return 0;
   }
 
   if (strcmp(argv[1], "create") == 0) {
