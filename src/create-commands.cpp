@@ -70,7 +70,7 @@ int CreateCommands::CreateHeader(int argc, char **argv) {
     std::cout << "Header already exists.\n";
   }
 
-  if (std::filesystem::exists(sourceFile)) {
+  if (!std::filesystem::exists(sourceFile)) {
     std::ofstream foo(sourceFile);
   } else {
     std::cout << "Source file already exists\n";
