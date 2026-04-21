@@ -30,5 +30,6 @@ int main(int argc, char **argv) {
     return CreateCommands::CallCreate(argc, argv);
   }
 
+  std::cout << "Invalid usage; try 'fsysutils help' for usage instructions.\n";
   return 0;
 }
