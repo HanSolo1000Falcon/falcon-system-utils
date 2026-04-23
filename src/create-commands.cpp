@@ -115,6 +115,7 @@ int CreateCommands::CreateProject(int argc, char **argv) {
                "ON)\nset(CMAKE_CXX_SCAN_FOR_MODULES OFF)\n\nadd_executable(" +
                formattedName + " src/main.c)\ntarget_include_directories(" +
                formattedName + " PRIVATE include)";
+    std::ofstream(std::filesystem::path(argv[3]) / ".gitignore") << "build/";
     system(std::format("cmake -S {} -B {}/build -G Ninja", argv[3], argv[3])
                .c_str());
   } else if (strcmp(argv[4], "cpp") == 0) {
@@ -128,6 +129,7 @@ int CreateCommands::CreateProject(int argc, char **argv) {
                "ON)\nset(CMAKE_CXX_SCAN_FOR_MODULES OFF)\n\nadd_executable(" +
                formattedName + " src/main.cpp)\ntarget_include_directories(" +
                formattedName + " PRIVATE include)";
+    std::ofstream(std::filesystem::path(argv[3]) / ".gitignore") << "build/";
     system(std::format("cmake -S {} -B {}/build -G Ninja", argv[3], argv[3])
                .c_str());
   } else {
