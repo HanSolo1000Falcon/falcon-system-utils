@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 4.1)
+cmake_minimum_required(VERSION 3.31.10)
 
 project(falcon_system_utils LANGUAGES CXX)
 
