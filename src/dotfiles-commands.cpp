@@ -37,7 +37,7 @@ int DotfilesCommands::FetchDotfiles(int argc, char **argv) {
 
   if (!std::filesystem::exists(gitDirectory)) {
     system(("git -C " + configDirectory.string() + " init").c_str());
-    system(("git -C " + std::string(remote) + " remote add origin").c_str());
+    system(("git -C " + configDirectory.string() + " remote add origin " + remote).c_str());
     system(("git -C " + configDirectory.string() + " fetch").c_str());
     system(("git -C " + configDirectory.string() +
             " checkout -b main --track origin/main")
