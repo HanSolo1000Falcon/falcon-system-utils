@@ -82,6 +82,7 @@ Flags:
     -v, --version - Prints the version of fsysutils"
                     )
                 }
+                "--version" => println!("fsysutils version: {}", env!("CARGO_PKG_VERSION")),
                 _ => {
                     return Err(Error::new(
                         std::io::ErrorKind::InvalidInput,
@@ -91,12 +92,9 @@ Flags:
             }
         }
     } else {
-        if args[1] == "update" {
-            if args_len != 2 {
-                println!("Can't run update with arguments, continuing execution...");
-            }
-
-            return updatehandler::update_program();
+        return match args[1].as_ref() {
+            "update" => updatehandler::update_program(),
+            _ => Err(Error::new(std::io::ErrorKind::InvalidInput, "Invalid usage. Unknown command.")),
         }
     }
     Ok(())
