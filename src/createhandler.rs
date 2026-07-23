@@ -142,13 +142,14 @@ fn create_header(args: Vec<String>) -> Result<(), Error> {
         )),
     };
 
-    let header_path: PathBuf = PathBuf::from("./include").join(args[4].clone());
-    let source_path: PathBuf = PathBuf::from("./src").join(args[4].clone());
+    let cleaned_path: String = args[4].strip_prefix("/").unwrap_or(&args[4]).to_string();
+    let header_path: PathBuf = PathBuf::from("./include").join(&cleaned_path);
+    let source_path: PathBuf = PathBuf::from("./src").join(&cleaned_path);
 
     std::fs::create_dir_all(&header_path)?;
     std::fs::create_dir_all(&source_path)?;
 
-    std::fs::write(header_path.join(format!("{}{}", args[3].clone(), header_ext)), "#pragma once")?;
-    std::fs::write(source_path.join(format!("{}{}", args[3].clone(), source_ext)), "")?;
+    std::fs::write(header_path.join(format!("{}{}", &args[3], header_ext)), "#pragma once")?;
+    std::fs::write(source_path.join(format!("{}{}", &args[3], source_ext)), "")?;
     Ok(())
 }
