@@ -59,7 +59,37 @@ fn main() -> Result<(), Error> {
                 }
             }
         }
-        println!("{:?}", flags);
+
+        for flag in flags {
+            match flag {
+                "--help" => {
+                    println!(
+                        r"
+fsysutils help wizard
+
+Commands:
+    update - Update fsysutils to the latest version
+    dotfiles:
+        pull|fetch|install - Gets the latest dotfiles from the specified .config repository (default: https://github.com/hansolo1000falcon/.config.git)
+        push - Pushes the specified .config repository (default: https://github.com/hansolo1000falcon/.config.git)
+        set-remote <remote-url> - Sets the remote repository for the dotfiles
+    create:
+        project <project-name> <c|cpp> - Creates a new project with the specified name and language
+        header <header-name> <subdir> <c|cpp> - Creates a new header file with the specified name and language in the specified subdirectory of include/
+
+Flags:
+    -h, --help - Prints this help message
+    -v, --version - Prints the version of fsysutils"
+                    )
+                }
+                _ => {
+                    return Err(Error::new(
+                        std::io::ErrorKind::InvalidInput,
+                        "Invalid usage. Unknown flag.",
+                    ));
+                }
+            }
+        }
     } else {
         if args[1] == "update" {
             if args_len != 2 {
