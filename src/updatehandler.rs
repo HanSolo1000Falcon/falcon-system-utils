@@ -1,18 +1,19 @@
 use std::env::temp_dir;
-use std::fmt::format;
 use std::io::Error;
 use std::path::PathBuf;
 use std::process::{Command, ExitStatus};
 
 pub fn update_program() -> Result<(), Error> {
     let project_name: &str = "falcon-system-utils";
-    let temp_dir: PathBuf = temp_dir();
-    let project_dir: PathBuf = temp_dir.join(project_name);
+    let project_dir: PathBuf = temp_dir().join(project_name);
 
     let clone_status: ExitStatus = Command::new("git")
         .arg("clone")
-        .arg(format!("https://github.com/hansolo1000falcon/{}.git", &project_name))
-        .arg(&temp_dir)
+        .arg(format!(
+            "https://github.com/hansolo1000falcon/{}.git",
+            &project_name
+        ))
+        .arg(&project_dir)
         .status()
         .expect("Failed to clone repository");
 
@@ -23,7 +24,7 @@ pub fn update_program() -> Result<(), Error> {
         ));
     }
 
-    let compile_status = Command::new("cargo")
+    let compile_status: ExitStatus = Command::new("cargo")
         .arg("build")
         .arg("--release")
         .arg("--manifest-path")
@@ -32,15 +33,13 @@ pub fn update_program() -> Result<(), Error> {
         .expect("Failed to compile");
 
     if !compile_status.success() {
-        return Err(Error::new(
-            std::io::ErrorKind::Other,
-            "Failed to compile",
-        ));
+        return Err(Error::new(std::io::ErrorKind::Other, "Failed to compile"));
     }
 
-    let bin_dir = PathBuf::from(std::env::var("PATH").unwrap()).join(".local/bin");
-    std::fs::create_dir_all(&bin_dir).expect("Failed to create directory ~/.local/bin");
-    std::fs::rename(project_dir.join("target/release/falcon-system-utils"), bin_dir.join("fsysutils")).expect("Failed to move binary");
+    let bin_dir: PathBuf = PathBuf::from(std::env::var("HOME").unwrap()).join(".local/bin");
+    let bin_path: PathBuf = project_dir.join(format!("target/release/{}", project_name));
+    std::fs::copy(bin_path, bin_dir.join(project_name)).expect("Failed to copy binary");
+    std::fs::rename(bin_dir.join(project_name), bin_dir.join("fsysutils")).expect("Failed to rename binary");
     std::fs::remove_dir_all(project_dir).expect("Failed to remove temporary directory");
     Ok(())
 }
