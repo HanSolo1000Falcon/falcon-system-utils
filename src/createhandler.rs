@@ -113,7 +113,42 @@ target_include_directories({} PRIVATE include)
         }
     }
 
+    Command::new("git").arg("init").arg(format!("./{}", args[3])).status()?;
     Ok(())
 }
 
-fn create_header(args: Vec<String>) -> Result<(), Error> {}
+fn create_header(args: Vec<String>) -> Result<(), Error> {
+    if args.len() != 6 {
+        return Err(Error::new(
+            std::io::ErrorKind::InvalidInput,
+            "Invalid usage. Run with the --help|-h flag for usage instructions.",
+        ));
+    }
+
+    let header_ext: &str = match args[5].as_ref() {
+        "c" => ".h",
+        "cpp" => ".hpp",
+        _ => return Err(Error::new(
+            std::io::ErrorKind::InvalidInput,
+            "Invalid language specified.",
+        )),
+    };
+    let source_ext: &str = match args[5].as_ref() {
+        "c" => ".c",
+        "cpp" => ".cpp",
+        _ => return Err(Error::new(
+            std::io::ErrorKind::InvalidInput,
+            "Invalid language specified.",
+        )),
+    };
+
+    let header_path: PathBuf = PathBuf::from("./include").join(args[4].clone());
+    let source_path: PathBuf = PathBuf::from("./src").join(args[4].clone());
+
+    std::fs::create_dir_all(&header_path)?;
+    std::fs::create_dir_all(&source_path)?;
+
+    std::fs::write(header_path.join(format!("{}{}", args[3].clone(), header_ext)), "#pragma once")?;
+    std::fs::write(source_path.join(format!("{}{}", args[3].clone(), source_ext)), "")?;
+    Ok(())
+}
