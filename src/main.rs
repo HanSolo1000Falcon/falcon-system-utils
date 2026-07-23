@@ -1,4 +1,5 @@
 mod updatehandler;
+mod dotfileshandler;
 
 use std::collections::HashMap;
 use std::io::Error;
@@ -72,6 +73,7 @@ Commands:
     dotfiles:
         pull|fetch|install - Gets the latest dotfiles from the specified .config repository (default: https://github.com/hansolo1000falcon/.config.git)
         push - Pushes the specified .config repository (default: https://github.com/hansolo1000falcon/.config.git)
+        add <folder|file>... - Adds the specified folder or file to the dotfiles git repository
         set-remote <remote-url> - Sets the remote repository for the dotfiles
     create:
         project <project-name> <c|cpp> - Creates a new project with the specified name and language
@@ -94,8 +96,12 @@ Flags:
     } else {
         return match args[1].as_ref() {
             "update" => updatehandler::update_program(),
-            _ => Err(Error::new(std::io::ErrorKind::InvalidInput, "Invalid usage. Unknown command.")),
-        }
+            "dotfiles" => dotfileshandler::invoke_dotfiles(args),
+            _ => Err(Error::new(
+                std::io::ErrorKind::InvalidInput,
+                "Invalid usage. Unknown command.",
+            )),
+        };
     }
     Ok(())
 }

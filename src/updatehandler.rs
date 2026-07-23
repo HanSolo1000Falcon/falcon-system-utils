@@ -36,10 +36,11 @@ pub fn update_program() -> Result<(), Error> {
         return Err(Error::new(std::io::ErrorKind::Other, "Failed to compile"));
     }
 
-    let bin_dir: PathBuf = PathBuf::from(std::env::var("HOME").unwrap()).join(".local/bin");
+    let bin_dir: PathBuf = PathBuf::from(env!("HOME")).join(".local/bin");
     let bin_path: PathBuf = project_dir.join(format!("target/release/{}", project_name));
     std::fs::copy(bin_path, bin_dir.join(project_name)).expect("Failed to copy binary");
-    std::fs::rename(bin_dir.join(project_name), bin_dir.join("fsysutils")).expect("Failed to rename binary");
+    std::fs::rename(bin_dir.join(project_name), bin_dir.join("fsysutils"))
+        .expect("Failed to rename binary");
     std::fs::remove_dir_all(project_dir).expect("Failed to remove temporary directory");
     Ok(())
 }
