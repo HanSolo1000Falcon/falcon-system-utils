@@ -1,5 +1,6 @@
-mod updatehandler;
 mod dotfileshandler;
+mod updatehandler;
+mod createhandler;
 
 use std::collections::HashMap;
 use std::io::Error;
@@ -97,6 +98,7 @@ Flags:
         return match args[1].as_ref() {
             "update" => updatehandler::update_program(),
             "dotfiles" => dotfileshandler::invoke_dotfiles(args),
+            "create" => createhandler::invoke_create(args),
             _ => Err(Error::new(
                 std::io::ErrorKind::InvalidInput,
                 "Invalid usage. Unknown command.",
