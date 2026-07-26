@@ -2,11 +2,26 @@ use serde::{Deserialize, Serialize};
 use std::io::Error;
 use std::path::PathBuf;
 use std::process::Command;
+use clap::Subcommand;
 
 #[derive(Debug, Deserialize, Serialize)]
 struct Config {
     remote: String,
     add: Vec<String>,
+}
+
+#[derive(Subcommand, Debug)]
+pub enum DotfilesCommand {
+    Pull,
+    Fetch,
+    Install,
+    Push,
+    Add {
+        add: Vec<String>,
+    },
+    SetRemote {
+        remote: String,
+    },
 }
 
 fn fetch_config() -> Result<Config, Error> {
@@ -28,27 +43,14 @@ fn fetch_config() -> Result<Config, Error> {
     }
 }
 
-pub fn invoke_dotfiles(args: Vec<String>) -> Result<(), Error> {
-    if args.len() < 3 {
-        return Err(Error::new(
-            std::io::ErrorKind::InvalidInput,
-            "Invalid usage. Run with the --help|-h flag for usage instructions.",
-        ));
-    }
-
+pub fn invoke_dotfiles(command: DotfilesCommand) -> Result<(), Error> {
     let mut config: Config = fetch_config()?;
 
-    match args[2].as_ref() {
-        "pull" | "fetch" | "install" => fetch_dotfiles(&config)?,
-        "push" => push_dotfiles(&config)?,
-        "add" => add_dotfiles(&mut config, args)?,
-        "set-remote" => set_remote_dotfiles(&mut config, args)?,
-        _ => {
-            return Err(Error::new(
-                std::io::ErrorKind::InvalidInput,
-                "Invalid usage. Unknown command.",
-            ));
-        }
+    match command {
+        DotfilesCommand::Pull | DotfilesCommand::Fetch | DotfilesCommand::Install => fetch_dotfiles(&config)?,
+        DotfilesCommand::Push => push_dotfiles(&config)?,
+        DotfilesCommand::Add { add } => add_dotfiles(&mut config, &add)?,
+        DotfilesCommand::SetRemote { remote } => set_remote_dotfiles(&mut config, &remote)?,
     }
 
     std::fs::write(
@@ -132,28 +134,14 @@ fn push_dotfiles(config: &Config) -> Result<(), Error> {
     Ok(())
 }
 
-fn add_dotfiles(config: &mut Config, args: Vec<String>) -> Result<(), Error> {
-    if args.len() < 4 {
-        return Err(Error::new(
-            std::io::ErrorKind::InvalidInput,
-            "Invalid usage. Run with the --help|-h flag for usage instructions.",
-        ));
-    }
-
-    for i in 3..args.len() {
-        config.add.push(args[i].clone());
+fn add_dotfiles(config: &mut Config, add: &Vec<String>) -> Result<(), Error> {
+    for to_add in add {
+        config.add.push(to_add.clone());
     }
     Ok(())
 }
 
-fn set_remote_dotfiles(config: &mut Config, args: Vec<String>) -> Result<(), Error> {
-    if args.len() != 4 {
-        return Err(Error::new(
-            std::io::ErrorKind::InvalidInput,
-            "Invalid usage. Run with the --help|-h flag for usage instructions.",
-        ));
-    }
-
-    config.remote = args[3].clone();
+fn set_remote_dotfiles(config: &mut Config, remote: &String) -> Result<(), Error> {
+    config.remote = remote.clone();
     Ok(())
 }
