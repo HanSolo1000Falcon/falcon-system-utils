@@ -3,7 +3,7 @@ use std::io::Error;
 use std::path::PathBuf;
 use std::process::{Command, ExitStatus};
 
-pub fn update_program() -> Result<(), Error> {
+pub fn update_program() -> Result<(), Box<dyn std::error::Error>> {
     let project_name: &str = "falcon-system-utils";
     let project_dir: PathBuf = temp_dir().join(project_name);
 
@@ -17,10 +17,10 @@ pub fn update_program() -> Result<(), Error> {
         .status()?;
 
     if !clone_status.success() {
-        return Err(Error::new(
+        return Err(Box::new(Error::new(
             std::io::ErrorKind::Other,
             "Failed to clone repository",
-        ));
+        )));
     }
 
     let compile_status: ExitStatus = Command::new("cargo")
@@ -31,7 +31,7 @@ pub fn update_program() -> Result<(), Error> {
         .status()?;
 
     if !compile_status.success() {
-        return Err(Error::new(std::io::ErrorKind::Other, "Failed to compile"));
+        return Err(Box::new(Error::new(std::io::ErrorKind::Other, "Failed to compile")));
     }
 
     let bin_dir: PathBuf = PathBuf::from(env!("HOME")).join(".local/bin");

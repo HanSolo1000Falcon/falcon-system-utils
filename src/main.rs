@@ -1,6 +1,7 @@
 mod dotfiles_handler;
 mod update_handler;
 mod create_handler;
+mod exchange_handler;
 
 use std::io::Error;
 use clap::{Parser, Subcommand};
@@ -23,9 +24,17 @@ enum Command {
         #[command(subcommand)]
         subcommand: dotfiles_handler::DotfilesCommand,
     },
+    Exchange {
+        #[clap(short, long)]
+        from: Option<String>,
+        #[clap(short, long)]
+        to: Option<String>,
+        #[clap(short, long)]
+        amount: Option<f64>,
+    }
 }
 
-fn main() -> Result<(), Error> {
+fn main() -> Result<(), Box<dyn std::error::Error>> {
     if std::env::consts::OS != "linux" {
         println!("Linux only program, expect broken behaviour on other platforms.");
     }
@@ -35,5 +44,6 @@ fn main() -> Result<(), Error> {
         Command::Update => update_handler::update_program(),
         Command::Create { subcommand } => create_handler::invoke_create(subcommand),
         Command::Dotfiles { subcommand } => dotfiles_handler::invoke_dotfiles(subcommand),
+        Command::Exchange { from, to, amount } => exchange_handler::invoke_exchange(from, to, amount),
     }
 }

@@ -22,20 +22,20 @@ pub enum LangType {
     Cpp
 }
 
-pub fn invoke_create(command: CreateCommand) -> Result<(), Error> {
+pub fn invoke_create(command: CreateCommand) -> Result<(), Box<dyn std::error::Error>> {
     match command {
         CreateCommand::Project { name, lang } => create_project(name.as_ref(), &lang),
         CreateCommand::Header { subdir, name, lang }=> create_header(subdir.as_ref(), name.as_ref(), &lang),
     }
 }
 
-fn create_project(name: &str, lang: &LangType) -> Result<(), Error> {
+fn create_project(name: &str, lang: &LangType) -> Result<(), Box<dyn std::error::Error>> {
     let project_dir: PathBuf = PathBuf::from("./").join(name);
     if project_dir.exists() {
-        return Err(Error::new(
+        return Err(Box::new(Error::new(
             std::io::ErrorKind::AlreadyExists,
             "Directory already exists.",
-        ));
+        )));
     }
 
     let formatted_name: String = name.replace("-", "_").replace(" ", "_");
@@ -113,7 +113,7 @@ target_include_directories({} PRIVATE include)
     Ok(())
 }
 
-fn create_header(subdir: &str, name: &str, lang: &LangType) -> Result<(), Error> {
+fn create_header(subdir: &str, name: &str, lang: &LangType) -> Result<(), Box<dyn std::error::Error>> {
     let header_ext: &str = match lang {
         LangType::C => ".h",
         LangType::Cpp => ".hpp",

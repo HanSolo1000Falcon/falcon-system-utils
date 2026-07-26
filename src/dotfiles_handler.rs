@@ -39,7 +39,7 @@ fn fetch_config() -> Result<Config, Error> {
     }
 }
 
-pub fn invoke_dotfiles(command: DotfilesCommand) -> Result<(), Error> {
+pub fn invoke_dotfiles(command: DotfilesCommand) -> Result<(), Box<dyn std::error::Error>> {
     let mut config: Config = fetch_config()?;
 
     match command {
@@ -59,7 +59,7 @@ pub fn invoke_dotfiles(command: DotfilesCommand) -> Result<(), Error> {
     Ok(())
 }
 
-fn fetch_dotfiles(config: &Config) -> Result<(), Error> {
+fn fetch_dotfiles(config: &Config) -> Result<(), Box<dyn std::error::Error>> {
     let repo_dir: PathBuf = PathBuf::from(env!("HOME")).join(".local/share/.config-repo/");
     let config_dir: PathBuf = PathBuf::from(env!("HOME")).join(".config");
 
@@ -99,7 +99,7 @@ fn fetch_dotfiles(config: &Config) -> Result<(), Error> {
     Ok(())
 }
 
-fn push_dotfiles() -> Result<(), Error> {
+fn push_dotfiles() -> Result<(), Box<dyn std::error::Error>> {
     let repo_dir: PathBuf = PathBuf::from(env!("HOME")).join(".local/share/.config-repo/");
     Command::new("git")
         .arg("-C")
@@ -122,7 +122,7 @@ fn push_dotfiles() -> Result<(), Error> {
     Ok(())
 }
 
-fn add_dotfiles(add: &Vec<String>) -> Result<(), Error> {
+fn add_dotfiles(add: &Vec<String>) -> Result<(), Box<dyn std::error::Error>> {
     let config_dir: PathBuf = PathBuf::from(env!("HOME")).join(".config");
     let repo_dir: PathBuf = PathBuf::from(env!("HOME")).join(".local/share/.config-repo/");
 
@@ -152,7 +152,7 @@ fn add_dotfiles(add: &Vec<String>) -> Result<(), Error> {
     Ok(())
 }
 
-fn remove_dotfiles(remove: &Vec<String>) -> Result<(), Error> {
+fn remove_dotfiles(remove: &Vec<String>) -> Result<(), Box<dyn std::error::Error>> {
     let config_dir: PathBuf = PathBuf::from(env!("HOME")).join(".config");
     let repo_dir: PathBuf = PathBuf::from(env!("HOME")).join(".local/share/.config-repo/");
 
@@ -178,7 +178,7 @@ fn remove_dotfiles(remove: &Vec<String>) -> Result<(), Error> {
     Ok(())
 }
 
-fn set_remote_dotfiles(config: &mut Config, remote: &String) -> Result<(), Error> {
+fn set_remote_dotfiles(config: &mut Config, remote: &String) -> Result<(), Box<dyn std::error::Error>> {
     config.remote = remote.clone();
     Ok(())
 }
