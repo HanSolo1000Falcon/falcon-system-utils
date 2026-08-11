@@ -31,7 +31,10 @@ pub fn update_program() -> Result<(), Box<dyn std::error::Error>> {
         .status()?;
 
     if !compile_status.success() {
-        return Err(Box::new(Error::new(std::io::ErrorKind::Other, "Failed to compile")));
+        return Err(Box::new(Error::new(
+            std::io::ErrorKind::Other,
+            "Failed to compile",
+        )));
     }
 
     let bin_dir: PathBuf = PathBuf::from(env!("HOME")).join(".local/bin");

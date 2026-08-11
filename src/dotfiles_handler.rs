@@ -1,3 +1,4 @@
+use std::collections::HashMap;
 use clap::Subcommand;
 use serde::{Deserialize, Serialize};
 use std::fs::DirEntry;
@@ -9,6 +10,7 @@ use std::process::Command;
 #[derive(Debug, Deserialize, Serialize)]
 struct Config {
     remote: String,
+    custom_locations: HashMap<String, String>
 }
 
 #[derive(Subcommand, Debug)]
@@ -17,9 +19,17 @@ pub enum DotfilesCommand {
     Fetch,
     Install,
     Push,
-    Add { add: Vec<String> },
-    Remove { remove: Vec<String> },
-    SetRemote { remote: String },
+    Add {
+        #[clap(short, long)]
+        custom_location: Option<String>,
+        add: Vec<String>,
+    },
+    Remove {
+        remove: Vec<String>,
+    },
+    SetRemote {
+        remote: String,
+    },
 }
 
 fn fetch_config() -> Result<Config, Error> {
@@ -30,11 +40,13 @@ fn fetch_config() -> Result<Config, Error> {
         let contents: String = std::fs::read_to_string(&config_path)?;
         let config: Config = toml::from_str(&contents).unwrap_or_else(|_| Config {
             remote: String::from("https://github.com/hansolo1000falcon/.config.git"),
+            custom_locations: HashMap::new()
         });
         Ok(config)
     } else {
         Ok(Config {
             remote: String::from("https://github.com/hansolo1000falcon/.config.git"),
+            custom_locations: HashMap::new()
         })
     }
 }
@@ -47,8 +59,8 @@ pub fn invoke_dotfiles(command: DotfilesCommand) -> Result<(), Box<dyn std::erro
             fetch_dotfiles(&config)?
         }
         DotfilesCommand::Push => push_dotfiles()?,
-        DotfilesCommand::Add { add } => add_dotfiles(&add)?,
-        DotfilesCommand::Remove { remove } => remove_dotfiles(&remove)?,
+        DotfilesCommand::Add { custom_location, add } => add_dotfiles(&custom_location, &add, &mut config)?,
+        DotfilesCommand::Remove { remove } => remove_dotfiles(&remove, &mut config)?,
         DotfilesCommand::SetRemote { remote } => set_remote_dotfiles(&mut config, &remote)?,
     }
 
@@ -85,7 +97,7 @@ fn fetch_dotfiles(config: &Config) -> Result<(), Box<dyn std::error::Error>> {
             continue;
         }
 
-        let src: PathBuf = config_dir.join(file.file_name());
+        let src: PathBuf = if config.custom_locations.contains_key(&file.file_name().to_str().unwrap().to_string()) { PathBuf::from(&config.custom_locations[&file.file_name().to_str().unwrap().to_string()]) } else { config_dir.join(file.file_name()) };
         if src.exists() || src.is_symlink() {
             if src.is_dir() && !src.is_symlink() {
                 std::fs::remove_dir_all(&src)?;
@@ -122,8 +134,8 @@ fn push_dotfiles() -> Result<(), Box<dyn std::error::Error>> {
     Ok(())
 }
 
-fn add_dotfiles(add: &Vec<String>) -> Result<(), Box<dyn std::error::Error>> {
-    let config_dir: PathBuf = PathBuf::from(env!("HOME")).join(".config");
+fn add_dotfiles(custom_location: &Option<String>, add: &Vec<String>, config: &mut Config) -> Result<(), Box<dyn std::error::Error>> {
+    let config_dir: PathBuf = if let Some(custom_location) = custom_location { PathBuf::from(custom_location) } else { PathBuf::from(env!("HOME")).join(".config") };
     let repo_dir: PathBuf = PathBuf::from(env!("HOME")).join(".local/share/.config-repo/");
 
     for file in add {
@@ -131,7 +143,7 @@ fn add_dotfiles(add: &Vec<String>) -> Result<(), Box<dyn std::error::Error>> {
         let dst: PathBuf = repo_dir.join(file);
 
         if !src.exists() {
-            eprintln!("Skipping {file}, doesn't exist in ~/.config");
+            eprintln!("Skipping {file}, doesn't exist in {}", config_dir.to_str().unwrap());
             continue;
         }
         if src.is_symlink() {
@@ -146,18 +158,22 @@ fn add_dotfiles(add: &Vec<String>) -> Result<(), Box<dyn std::error::Error>> {
         std::fs::rename(&src, &dst)?;
         symlink(&dst, &src)?;
 
+        if custom_location.is_some() {
+            config.custom_locations.insert(file.clone(), src.to_str().unwrap().to_string());
+        }
+
         println!("Tracked {file}");
     }
 
     Ok(())
 }
 
-fn remove_dotfiles(remove: &Vec<String>) -> Result<(), Box<dyn std::error::Error>> {
+fn remove_dotfiles(remove: &Vec<String>, config: &mut Config) -> Result<(), Box<dyn std::error::Error>> {
     let config_dir: PathBuf = PathBuf::from(env!("HOME")).join(".config");
     let repo_dir: PathBuf = PathBuf::from(env!("HOME")).join(".local/share/.config-repo/");
 
     for file in remove {
-        let link: PathBuf = config_dir.join(file);
+        let link: PathBuf = if config.custom_locations.contains_key(file) { PathBuf::from(&config.custom_locations[file]) } else { config_dir.join(file) };
         let stored: PathBuf = repo_dir.join(file);
 
         if !link.is_symlink() {
@@ -178,7 +194,10 @@ fn remove_dotfiles(remove: &Vec<String>) -> Result<(), Box<dyn std::error::Error
     Ok(())
 }
 
-fn set_remote_dotfiles(config: &mut Config, remote: &String) -> Result<(), Box<dyn std::error::Error>> {
+fn set_remote_dotfiles(
+    config: &mut Config,
+    remote: &String,
+) -> Result<(), Box<dyn std::error::Error>> {
     config.remote = remote.clone();
     Ok(())
 }

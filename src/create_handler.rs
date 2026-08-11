@@ -1,31 +1,33 @@
+use clap::{Subcommand, ValueEnum};
 use std::io::Error;
 use std::path::PathBuf;
 use std::process::Command;
-use clap::{Subcommand, ValueEnum};
 
 #[derive(Subcommand, Debug)]
 pub enum CreateCommand {
     Project {
         name: String,
-        lang: LangType
+        lang: LangType,
     },
     Header {
         subdir: String,
         name: String,
-        lang: LangType
-    }
+        lang: LangType,
+    },
 }
 
 #[derive(ValueEnum, Clone, Debug)]
 pub enum LangType {
     C,
-    Cpp
+    Cpp,
 }
 
 pub fn invoke_create(command: CreateCommand) -> Result<(), Box<dyn std::error::Error>> {
     match command {
         CreateCommand::Project { name, lang } => create_project(name.as_ref(), &lang),
-        CreateCommand::Header { subdir, name, lang }=> create_header(subdir.as_ref(), name.as_ref(), &lang),
+        CreateCommand::Header { subdir, name, lang } => {
+            create_header(subdir.as_ref(), name.as_ref(), &lang)
+        }
     }
 }
 
@@ -109,11 +111,18 @@ target_include_directories({} PRIVATE include)
         }
     }
 
-    Command::new("git").arg("init").arg(format!("./{}", name)).status()?;
+    Command::new("git")
+        .arg("init")
+        .arg(format!("./{}", name))
+        .status()?;
     Ok(())
 }
 
-fn create_header(subdir: &str, name: &str, lang: &LangType) -> Result<(), Box<dyn std::error::Error>> {
+fn create_header(
+    subdir: &str,
+    name: &str,
+    lang: &LangType,
+) -> Result<(), Box<dyn std::error::Error>> {
     let header_ext: &str = match lang {
         LangType::C => ".h",
         LangType::Cpp => ".hpp",
@@ -130,7 +139,10 @@ fn create_header(subdir: &str, name: &str, lang: &LangType) -> Result<(), Box<dy
     std::fs::create_dir_all(&header_path)?;
     std::fs::create_dir_all(&source_path)?;
 
-    std::fs::write(header_path.join(format!("{}{}", &name, header_ext)), "#pragma once")?;
+    std::fs::write(
+        header_path.join(format!("{}{}", &name, header_ext)),
+        "#pragma once",
+    )?;
     std::fs::write(source_path.join(format!("{}{}", &name, source_ext)), "")?;
     Ok(())
 }

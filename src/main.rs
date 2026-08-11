@@ -1,9 +1,8 @@
-mod dotfiles_handler;
-mod update_handler;
 mod create_handler;
+mod dotfiles_handler;
 mod exchange_handler;
+mod update_handler;
 
-use std::io::Error;
 use clap::{Parser, Subcommand};
 
 #[derive(Parser)]
@@ -31,7 +30,7 @@ enum Command {
         to: Option<String>,
         #[clap(short, long)]
         amount: Option<f64>,
-    }
+    },
 }
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -44,6 +43,8 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         Command::Update => update_handler::update_program(),
         Command::Create { subcommand } => create_handler::invoke_create(subcommand),
         Command::Dotfiles { subcommand } => dotfiles_handler::invoke_dotfiles(subcommand),
-        Command::Exchange { from, to, amount } => exchange_handler::invoke_exchange(from, to, amount),
+        Command::Exchange { from, to, amount } => {
+            exchange_handler::invoke_exchange(from, to, amount)
+        }
     }
 }
