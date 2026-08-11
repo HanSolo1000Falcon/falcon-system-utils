@@ -155,6 +155,10 @@ fn add_dotfiles(custom_location: &Option<String>, add: &Vec<String>, config: &mu
             std::fs::create_dir_all(parent)?;
         }
 
+        if let Some(parent) = src.parent() {
+            std::fs::create_dir_all(parent)?;
+        }
+
         std::fs::rename(&src, &dst)?;
         symlink(&dst, &src)?;
 
@@ -187,6 +191,7 @@ fn remove_dotfiles(remove: &Vec<String>, config: &mut Config) -> Result<(), Box<
 
         std::fs::remove_file(&link)?;
         std::fs::rename(&stored, &link)?;
+        config.custom_locations.remove(file);
 
         println!("Untracked {file}");
     }
